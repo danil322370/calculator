@@ -1,0 +1,100 @@
+import csv
+import json
+from typing import List, Dict
+
+def convert_csv_to_json(csv_path: str, json_path: str) -> None:
+    """
+    Конвертирует CSV-файл в JSON-файл.
+    
+    Args:
+        csv_path: Путь к исходному CSV-файлу
+        json_path: Путь для сохранения JSON-файла
+    """
+    data = []
+    
+    # Чтение CSV-файла
+    with open(csv_path, 'r', encoding='utf-8') as csv_file:
+        reader = csv.DictReader(csv_file)
+        for row in reader:
+            data.append(row)
+    
+    # Запись в JSON-файл
+    with open(json_path, 'w', encoding='utf-8') as json_file:
+        json.dump(data, json_file, ensure_ascii=False, indent=4)
+    
+    print(f"Данные успешно сконвертированы из {csv_path} в {json_path}")
+    print(f"Конвертировано {len(data)} записей")
+
+def convert_json_to_csv(json_path: str, csv_path: str) -> None:
+    """
+    Конвертирует JSON-файл в CSV-файл.
+    
+    Args:
+        json_path: Путь к исходному JSON-файлу
+        csv_path: Путь для сохранения CSV-файла
+    """
+    # Чтение JSON-файла
+    with open(json_path, 'r', encoding='utf-8') as json_file:
+        data: List[Dict] = json.load(json_file)
+    
+    if not data:
+        print("JSON-файл пуст")
+        return
+    
+    # Определение заголовков по ключам первого элемента
+    headers = list(data[0].keys())
+    
+    # Запись в CSV-файл
+    with open(csv_path, 'w', encoding='utf-8', newline='') as csv_file:
+        writer = csv.DictWriter(csv_file, fieldnames=headers)
+        writer.writeheader()
+        writer.writerows(data)
+    
+    print(f"Данные успешно сконвертированы из {json_path} в {csv_path}")
+    print(f"Конвертировано {len(data)} записей")
+
+# Создание исходного CSV-файла animals.csv
+def create_animals_csv():
+    """Создает исходный CSV-файл с данными о животных."""
+    header = ['Животное', 'Среда обитания']
+    data = [
+        ['Медведь', 'Лес'],
+        ['Дельфин', 'Океан'],
+        ['Верблюд', 'Пустыня']
+    ]
+    
+    with open('animals.csv', 'w', encoding='utf-8', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(header)
+        writer.writerows(data)
+    
+    print("Файл animals.csv успешно создан!")
+    print("Содержимое файла:")
+    print("Животное,Среда обитания")
+    print("Медведь,Лес")
+    print("Дельфин,Океан")
+    print("Верблюд,Пустыня")
+
+# Демонстрация работы функций
+if __name__ == "__main__":
+    # Создаем исходный CSV-файл
+    create_animals_csv()
+    print("\n" + "="*50 + "\n")
+    
+    # Конвертируем CSV в JSON
+    convert_csv_to_json('animals.csv', 'animals.json')
+    print("\n" + "="*50 + "\n")
+    
+    # Конвертируем JSON обратно в CSV
+    convert_json_to_csv('animals.json', 'animals_converted.csv')
+    
+    print("\n" + "="*50 + "\n")
+    
+    # Показываем содержимое созданных файлов
+    print("Содержимое JSON-файла (animals.json):")
+    with open('animals.json', 'r', encoding='utf-8') as f:
+        print(f.read())
+    
+    print("\nСодержимое преобразованного CSV-файла (animals_converted.csv):")
+    with open('animals_converted.csv', 'r', encoding='utf-8') as f:
+        print(f.read())
